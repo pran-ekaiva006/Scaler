@@ -1,26 +1,195 @@
 @import "tailwindcss";
 
+/* ============================================================
+   POSTMAN CLONE — DARK THEME
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core surfaces */
+  --bg-app: #1c1c1c;
+  --bg-sidebar: #1e1e1e;
+  --bg-panel: #212121;
+  --bg-editor: #2b2b2b;
+  --bg-input: #2f2f2f;
+  --bg-hover: #333333;
+  --bg-active: #3a3a3a;
+
+  /* Icon rail */
+  --bg-rail: #161616;
+
+  /* Borders */
+  --border-default: #383838;
+  --border-subtle: #2e2e2e;
+  --border-focus: #ff6c37;
+
+  /* Text */
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --text-muted: #6b6b6b;
+  --text-inverse: #1c1c1c;
+
+  /* Postman brand orange */
+  --accent-orange: #ff6c37;
+  --accent-orange-hover: #e5582a;
+  --accent-orange-glow: rgba(255, 108, 55, 0.15);
+
+  /* HTTP method colors */
+  --method-get: #49cc90;
+  --method-post: #fca130;
+  --method-put: #61affe;
+  --method-delete: #f93e3e;
+  --method-patch: #ab6fea;
+  --method-head: #6b6b6b;
+  --method-options: #6b6b6b;
+
+  /* Status colors */
+  --status-success: #49cc90;
+  --status-redirect: #fca130;
+  --status-client-error: #f93e3e;
+  --status-server-error: #f93e3e;
+
+  /* Scrollbar */
+  --scrollbar-track: #1c1c1c;
+  --scrollbar-thumb: #3a3a3a;
+  --scrollbar-thumb-hover: #4a4a4a;
+
+  /* Tab */
+  --tab-active-bg: #2b2b2b;
+  --tab-inactive-bg: #1e1e1e;
+  --tab-border-active: #ff6c37;
+
+  /* Misc */
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--bg-app);
+  --color-foreground: var(--text-primary);
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================================
+   BASE RESET & GLOBAL STYLES
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* ============================================================
+   RESIZABLE PANEL HANDLE
+   ============================================================ */
+
+[data-panel-resize-handle-id] {
+  width: 3px !important;
+  background: var(--border-default);
+  transition: background 0.15s ease;
+}
+[data-panel-resize-handle-id]:hover,
+[data-panel-resize-handle-id][data-resize-handle-state="drag"] {
+  background: var(--accent-orange);
+}
+
+/* ============================================================
+   METHOD BADGES
+   ============================================================ */
+
+.method-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 1px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.method-GET    { color: var(--method-get); }
+.method-POST   { color: var(--method-post); }
+.method-PUT    { color: var(--method-put); }
+.method-DELETE { color: var(--method-delete); }
+.method-PATCH  { color: var(--method-patch); }
+.method-HEAD   { color: var(--method-head); }
+.method-OPTIONS{ color: var(--method-options); }
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+.truncate-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-send {
+  background: var(--accent-orange);
+  color: white;
+  border: none;
+  padding: 6px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-send:hover {
+  background: var(--accent-orange-hover);
+  box-shadow: 0 0 12px var(--accent-orange-glow);
+}
+.btn-send:active {
+  transform: scale(0.97);
+}
+
+/* ============================================================
+   ANIMATION KEYFRAMES
+   ============================================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
 }
