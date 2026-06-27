@@ -22,7 +22,7 @@ export default function CollectionsTree() {
 
   const [expandedCols, setExpandedCols] = useState<Set<number>>(new Set());
   const [expandedFolders, setExpandedFolders] = useState<Set<number>>(new Set());
-  
+
   // Modal state
   const [modalType, setModalType] = useState<"collection" | "folder" | "request" | null>(null);
   const [modalTargetId, setModalTargetId] = useState<number | null>(null);
@@ -78,11 +78,11 @@ export default function CollectionsTree() {
 
   const handleCreateRequest = async (isFolder: boolean) => {
     if (!modalInput.trim() || !modalTargetId) return;
-    
+
     // If target is folder, we need collectionId. Let's find it.
     let colId = modalTargetId; // assume it's collection initially
     let folderId: number | undefined = undefined;
-    
+
     if (isFolder) {
       folderId = modalTargetId;
       // find collection id
@@ -96,7 +96,7 @@ export default function CollectionsTree() {
       url: "https://",
       folder_id: folderId,
     });
-    
+
     if (isFolder) setExpandedFolders(new Set(expandedFolders).add(modalTargetId));
     else setExpandedCols(new Set(expandedCols).add(modalTargetId));
 
@@ -184,42 +184,42 @@ export default function CollectionsTree() {
                         onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-hover)")}
                         onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                       >
-                         <div onClick={() => toggleFolder(f.id)} style={{ display: "flex", alignItems: "center", flex: 1, gap: 6 }}>
-                            {isFolderExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-                            <Folder size={12} />
-                            <span className="truncate-text">{f.name}</span>
-                         </div>
-                         <div style={{ display: "flex", gap: 4 }}>
-                           <button
-                             title="Add Request"
-                             onClick={() => { setModalTargetId(f.id); setModalType("request-folder"); setModalInput(""); }}
-                             style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 10 }}
-                           >
-                             +R
-                           </button>
-                           <button
-                             title="Delete Folder"
-                             onClick={async () => { await deleteFolder(f.id); fetchCollections(); }}
-                             style={{ background: "none", border: "none", color: "var(--status-client-error)", cursor: "pointer", fontSize: 10 }}
-                           >
-                             ×
-                           </button>
-                         </div>
+                        <div onClick={() => toggleFolder(f.id)} style={{ display: "flex", alignItems: "center", flex: 1, gap: 6 }}>
+                          {isFolderExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                          <Folder size={12} />
+                          <span className="truncate-text">{f.name}</span>
+                        </div>
+                        <div style={{ display: "flex", gap: 4 }}>
+                          <button
+                            title="Add Request"
+                            onClick={() => { setModalTargetId(f.id); setModalType("request-folder"); setModalInput(""); }}
+                            style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 10 }}
+                          >
+                            +R
+                          </button>
+                          <button
+                            title="Delete Folder"
+                            onClick={async () => { await deleteFolder(f.id); fetchCollections(); }}
+                            style={{ background: "none", border: "none", color: "var(--status-client-error)", cursor: "pointer", fontSize: 10 }}
+                          >
+                            ×
+                          </button>
+                        </div>
                       </div>
-                      
+
                       {isFolderExpanded && (
-                         <div style={{ display: "flex", flexDirection: "column", marginLeft: 14, borderLeft: "1px solid var(--border-subtle)", paddingLeft: 4 }}>
-                           {f.requests.map((req) => (
-                             <RequestRow key={req.id} req={req} onClick={() => handleOpenRequest(req)} onRefresh={fetchCollections} />
-                           ))}
-                         </div>
+                        <div style={{ display: "flex", flexDirection: "column", marginLeft: 14, borderLeft: "1px solid var(--border-subtle)", paddingLeft: 4 }}>
+                          {f.requests.map((req) => (
+                            <RequestRow key={req.id} req={req} onClick={() => handleOpenRequest(req)} onRefresh={fetchCollections} />
+                          ))}
+                        </div>
                       )}
                     </div>
                   );
                 })}
-                
+
                 {col.requests.map((req) => (
-                   <RequestRow key={req.id} req={req} onClick={() => handleOpenRequest(req)} onRefresh={fetchCollections} />
+                  <RequestRow key={req.id} req={req} onClick={() => handleOpenRequest(req)} onRefresh={fetchCollections} />
                 ))}
               </div>
             )}
@@ -232,8 +232,8 @@ export default function CollectionsTree() {
         onClose={() => setModalType(null)}
         title={
           modalType === "collection" ? "New Collection" :
-          modalType === "folder" ? "New Folder" :
-          "New Request"
+            modalType === "folder" ? "New Folder" :
+              "New Request"
         }
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
