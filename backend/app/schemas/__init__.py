@@ -86,3 +86,46 @@ class CollectionResponse(CollectionBase):
         return self
         
     model_config = ConfigDict(from_attributes=True)
+
+# --- Environment Variable ---
+
+class EnvironmentVariableBase(BaseModel):
+    key: str
+    value: str
+    enabled: Optional[bool] = True
+    order_index: Optional[int] = 0
+
+class EnvironmentVariableCreate(EnvironmentVariableBase):
+    pass
+
+class EnvironmentVariableUpdate(BaseModel):
+    key: Optional[str] = None
+    value: Optional[str] = None
+    enabled: Optional[bool] = None
+    order_index: Optional[int] = None
+
+class EnvironmentVariableResponse(EnvironmentVariableBase):
+    id: int
+    environment_id: int
+    model_config = ConfigDict(from_attributes=True)
+
+# --- Environment ---
+
+class EnvironmentBase(BaseModel):
+    name: str
+    is_active: Optional[bool] = False
+
+class EnvironmentCreate(EnvironmentBase):
+    pass
+
+class EnvironmentUpdate(BaseModel):
+    name: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class EnvironmentResponse(EnvironmentBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    variables: List[EnvironmentVariableResponse] = []
+    model_config = ConfigDict(from_attributes=True)
+
