@@ -10,6 +10,7 @@ import IconRail from "./IconRail";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import TabBar from "./TabBar";
+import { Zap } from "lucide-react";
 
 const PLACEHOLDER_TABS = [
   { id: "1", name: "Get Users", method: "GET" },
@@ -111,7 +112,9 @@ function EmptyState() {
         color: "var(--text-muted)",
       }}
     >
-      <div style={{ fontSize: 48, opacity: 0.3 }}>⚡</div>
+      <div style={{ opacity: 0.3, color: "var(--text-secondary)" }}>
+        <Zap size={64} strokeWidth={1} />
+      </div>
       <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text-secondary)" }}>
         Ready to send a request
       </div>

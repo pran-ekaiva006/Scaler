@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
+import { Folder, History, Globe } from "lucide-react";
 
 const RAIL_ICONS = [
-  { id: "collections", label: "Collections", icon: "📁" },
-  { id: "history", label: "History", icon: "🕒" },
-  { id: "environments", label: "Environments", icon: "🌍" },
+  { id: "collections", label: "Collections", icon: <Folder size={20} strokeWidth={1.5} /> },
+  { id: "history", label: "History", icon: <History size={20} strokeWidth={1.5} /> },
+  { id: "environments", label: "Environments", icon: <Globe size={20} strokeWidth={1.5} /> },
 ];
 
 interface IconRailProps {

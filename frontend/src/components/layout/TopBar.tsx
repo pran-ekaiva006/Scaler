@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Zap } from "lucide-react";
 
 export default function TopBar() {
   return (
@@ -26,13 +27,13 @@ export default function TopBar() {
       >
         <span
           style={{
-            fontSize: 15,
-            fontWeight: 700,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             color: "var(--accent-orange)",
-            letterSpacing: "-0.02em",
           }}
         >
-          ⚡
+          <Zap size={18} fill="currentColor" strokeWidth={1} />
         </span>
         <span
           style={{

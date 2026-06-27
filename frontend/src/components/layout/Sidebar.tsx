@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { ChevronRight, Folder } from "lucide-react";
 
 interface SidebarProps {
   activeTab: string;
@@ -105,7 +106,7 @@ function CollectionsPlaceholder() {
               (e.currentTarget.style.background = "transparent")
             }
           >
-            <span style={{ fontSize: 11, color: "var(--text-muted)" }}>▸</span>
+            <ChevronRight size={14} color="var(--text-muted)" style={{ flexShrink: 0 }} />
             <span className="truncate-text">{col.name}</span>
           </div>
           {col.folders.map((f) => (
@@ -126,7 +127,8 @@ function CollectionsPlaceholder() {
                 (e.currentTarget.style.background = "transparent")
               }
             >
-              📂 {f}
+              <Folder size={14} color="var(--text-secondary)" style={{ marginRight: 6, flexShrink: 0 }} />
+              <span className="truncate-text">{f}</span>
             </div>
           ))}
         </div>
