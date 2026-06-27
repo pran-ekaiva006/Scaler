@@ -129,3 +129,33 @@ class EnvironmentResponse(EnvironmentBase):
     variables: List[EnvironmentVariableResponse] = []
     model_config = ConfigDict(from_attributes=True)
 
+# --- Proxy Send ---
+
+class ProxySendBody(BaseModel):
+    raw_content: Optional[str] = None
+    raw_content_type: Optional[str] = None  # "json" | "text"
+    form_data: Optional[List[dict]] = None
+
+class ProxySendRequest(BaseModel):
+    method: str
+    url: str
+    params: Optional[List[dict]] = []
+    headers: Optional[List[dict]] = []
+    body_type: Optional[str] = "none"  # "none" | "raw" | "form-data" | "x-www-form-urlencoded"
+    body: Optional[ProxySendBody] = None
+    auth_type: Optional[str] = "none"  # "none" | "bearer" | "basic"
+    auth: Optional[dict] = None
+    environment_id: Optional[int] = None
+    request_id: Optional[int] = None   # link to saved request for history
+
+class ProxyResponse(BaseModel):
+    status: Optional[int] = None
+    headers: Optional[dict] = None
+    body: Optional[str] = None
+    time_ms: int = 0
+    size_bytes: Optional[int] = None
+    is_json: Optional[bool] = None
+    error: Optional[str] = None
+    message: Optional[str] = None
+    history_id: Optional[int] = None
+

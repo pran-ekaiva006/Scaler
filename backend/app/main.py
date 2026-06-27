@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.database import init_db
 import app.models  # Import models to register them with Base.metadata
-from app.routers import collections, folders, requests, environments
+from app.routers import collections, folders, requests, environments, proxy
 
 settings = get_settings()
 
@@ -36,6 +36,7 @@ app.include_router(collections.router)
 app.include_router(folders.router)
 app.include_router(requests.router)
 app.include_router(environments.router)
+app.include_router(proxy.router)
 
 @app.get("/api/health")
 async def health_check():
