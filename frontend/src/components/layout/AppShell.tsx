@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Group as PanelGroup,
   Panel,
@@ -11,6 +11,9 @@ import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import TabBar from "./TabBar";
 import { Zap } from "lucide-react";
+import { useCollectionsStore } from "@/store/collectionsStore";
+import { useEnvironmentsStore } from "@/store/environmentsStore";
+import { useHistoryStore } from "@/store/historyStore";
 
 const PLACEHOLDER_TABS = [
   { id: "1", name: "Get Users", method: "GET" },
@@ -33,6 +36,27 @@ export default function AppShell({
       setActiveTabId(remaining.length > 0 ? remaining[0].id : null);
     }
   };
+
+  const fetchCollections = useCollectionsStore((state) => state.fetchCollections);
+  const fetchEnvironments = useEnvironmentsStore((state) => state.fetchEnvironments);
+  const fetchHistory = useHistoryStore((state) => state.fetchHistory);
+  
+  const collections = useCollectionsStore((state) => state.collections);
+  const environments = useEnvironmentsStore((state) => state.environments);
+  const historyItems = useHistoryStore((state) => state.history);
+
+  useEffect(() => {
+    fetchCollections().then(() => console.log("Fetched collections on load"));
+    fetchEnvironments().then(() => console.log("Fetched environments on load"));
+    fetchHistory().then(() => console.log("Fetched history on load"));
+  }, [fetchCollections, fetchEnvironments, fetchHistory]);
+
+  // Temporary logging to verify state population
+  useEffect(() => {
+    if (collections.length > 0) console.log("Collections store hydrated:", collections);
+    if (environments.length > 0) console.log("Environments store hydrated:", environments);
+    if (historyItems.length > 0) console.log("History store hydrated:", historyItems);
+  }, [collections, environments, historyItems]);
 
   return (
     <div
