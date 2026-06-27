@@ -1,18 +1,74 @@
-# Node
+# ========================
+# Node / Frontend
+# ========================
 node_modules/
 .next/
-.env*.local
+out/
+build/
+.pnp
+.pnp.*
+.yarn/*
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.tsbuildinfo
+next-env.d.ts
+.vercel
 
-# Python
+# ========================
+# Python / Backend
+# ========================
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 venv/
 .venv/
-*.db
+env/
+*.egg-info/
+dist/
+*.egg
 
-# IDE
+# ========================
+# Database
+# ========================
+*.db
+*.sqlite3
+
+# ========================
+# Environment / Secrets
+# ========================
+.env
+.env*.local
+.env.production
+.env.staging
+# .env.example is OK to commit
+
+# ========================
+# IDE / Editor
+# ========================
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# OS
+# ========================
+# OS generated
+# ========================
 .DS_Store
+Thumbs.db
+
+# ========================
+# AI agent generated
+# ========================
+AGENTS.md
+CLAUDE.md
+
+# ========================
+# Misc
+# ========================
+*.pem
+*.log

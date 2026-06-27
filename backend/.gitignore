@@ -1,12 +1,22 @@
-# Python
+# Python bytecode
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+
+# Virtual environments
 venv/
 .venv/
+env/
 
-# Database
+# Database files
 *.db
+*.sqlite3
 
-# Environment
+# Environment secrets (.env.example is OK)
 .env
+
+# Distribution
+*.egg-info/
+dist/
+*.egg
