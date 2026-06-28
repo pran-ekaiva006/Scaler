@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { ChevronRight, ChevronDown, Folder, MoreHorizontal } from "lucide-react";
 import { useCollectionsStore } from "@/store/collectionsStore";
 import { useTabsStore } from "@/store/tabsStore";
+import { useToastStore } from "@/store/toastStore";
 import {
   createCollection,
   deleteCollection,
@@ -19,6 +20,7 @@ export default function CollectionsTree() {
   const collections = useCollectionsStore((state) => state.collections);
   const fetchCollections = useCollectionsStore((state) => state.fetchCollections);
   const openTab = useTabsStore((state) => state.openTab);
+  const addToast = useToastStore((state) => state.addToast);
 
   const [expandedCols, setExpandedCols] = useState<Set<number>>(new Set());
   const [expandedFolders, setExpandedFolders] = useState<Set<number>>(new Set());
@@ -71,11 +73,16 @@ export default function CollectionsTree() {
 
   const handleCreateFolder = async () => {
     if (!modalInput.trim() || !modalTargetId) return;
-    await createFolder(modalTargetId, { name: modalInput });
-    setExpandedCols(new Set(expandedCols).add(modalTargetId));
-    setModalType(null);
-    setModalInput("");
-    await fetchCollections();
+    try {
+      await createFolder(modalTargetId, { name: modalInput });
+      setExpandedCols(new Set(expandedCols).add(modalTargetId));
+      setModalType(null);
+      setModalInput("");
+      await fetchCollections();
+      addToast("Folder created successfully", "success");
+    } catch (e: any) {
+      addToast(e.message || "Failed to create folder", "error");
+    }
   };
 
   const handleCreateRequest = async (isFolder: boolean) => {
@@ -92,19 +99,24 @@ export default function CollectionsTree() {
       if (col) colId = col.id;
     }
 
-    await createSavedRequest(colId, {
-      name: modalInput,
-      method: "GET",
-      url: "https://",
-      folder_id: folderId,
-    });
+    try {
+      await createSavedRequest(colId, {
+        name: modalInput,
+        method: "GET",
+        url: "https://",
+        folder_id: folderId,
+      });
 
-    if (isFolder) setExpandedFolders(new Set(expandedFolders).add(modalTargetId));
-    else setExpandedCols(new Set(expandedCols).add(modalTargetId));
+      if (isFolder) setExpandedFolders(new Set(expandedFolders).add(modalTargetId));
+      else setExpandedCols(new Set(expandedCols).add(modalTargetId));
 
-    setModalType(null);
-    setModalInput("");
-    await fetchCollections();
+      setModalType(null);
+      setModalInput("");
+      await fetchCollections();
+      addToast("Request created successfully", "success");
+    } catch (e: any) {
+      addToast(e.message || "Failed to create request", "error");
+    }
   };
 
   const submitModal = () => {
@@ -157,7 +169,15 @@ export default function CollectionsTree() {
                 </button>
                 <button
                   title="Delete Collection"
-                  onClick={async () => { await deleteCollection(col.id); fetchCollections(); }}
+                  onClick={async () => {
+                    try {
+                      await deleteCollection(col.id);
+                      await fetchCollections();
+                      addToast("Collection deleted", "success");
+                    } catch (e: any) {
+                      addToast(e.message || "Failed to delete collection", "error");
+                    }
+                  }}
                   style={{ background: "none", border: "none", color: "var(--status-client-error)", cursor: "pointer" }}
                 >
                   ×
@@ -201,7 +221,15 @@ export default function CollectionsTree() {
                           </button>
                           <button
                             title="Delete Folder"
-                            onClick={async () => { await deleteFolder(f.id); fetchCollections(); }}
+                            onClick={async () => {
+                              try {
+                                await deleteFolder(f.id);
+                                await fetchCollections();
+                                addToast("Folder deleted", "success");
+                              } catch (e: any) {
+                                addToast(e.message || "Failed to delete folder", "error");
+                              }
+                            }}
                             style={{ background: "none", border: "none", color: "var(--status-client-error)", cursor: "pointer", fontSize: 10 }}
                           >
                             ×
@@ -283,6 +311,7 @@ export default function CollectionsTree() {
 }
 
 function RequestRow({ req, onClick, onRefresh }: { req: SavedRequest, onClick: () => void, onRefresh: () => void }) {
+  const addToast = useToastStore((state) => state.addToast);
   return (
     <div
       style={{
@@ -307,7 +336,16 @@ function RequestRow({ req, onClick, onRefresh }: { req: SavedRequest, onClick: (
       </div>
       <button
         title="Delete Request"
-        onClick={async (e) => { e.stopPropagation(); await deleteSavedRequest(req.id); onRefresh(); }}
+        onClick={async (e) => {
+          e.stopPropagation();
+          try {
+            await deleteSavedRequest(req.id);
+            onRefresh();
+            addToast("Request deleted", "success");
+          } catch (error: any) {
+            addToast(error.message || "Failed to delete request", "error");
+          }
+        }}
         style={{ background: "none", border: "none", color: "var(--status-client-error)", cursor: "pointer", fontSize: 10, padding: 2 }}
       >
         ×

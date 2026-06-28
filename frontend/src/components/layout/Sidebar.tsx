@@ -7,6 +7,7 @@ import HistoryList from "./HistoryList";
 import Modal from "../common/Modal";
 import { createCollection } from "@/lib/api";
 import { useCollectionsStore } from "@/store/collectionsStore";
+import { useToastStore } from "@/store/toastStore";
 
 interface SidebarProps {
   activeTab: string;
@@ -16,13 +17,19 @@ export default function Sidebar({ activeTab }: SidebarProps) {
   const [showNewColModal, setShowNewColModal] = useState(false);
   const [newColName, setNewColName] = useState("");
   const fetchCollections = useCollectionsStore((state) => state.fetchCollections);
+  const addToast = useToastStore((state) => state.addToast);
 
   const handleCreateCollection = async () => {
     if (!newColName.trim()) return;
-    await createCollection({ name: newColName });
-    setShowNewColModal(false);
-    setNewColName("");
-    await fetchCollections();
+    try {
+      await createCollection({ name: newColName });
+      setShowNewColModal(false);
+      setNewColName("");
+      await fetchCollections();
+      addToast("Collection created successfully", "success");
+    } catch (e: any) {
+      addToast(e.message || "Failed to create collection", "error");
+    }
   };
   return (
     <div

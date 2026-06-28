@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useCollectionsStore } from "@/store/collectionsStore";
 import { createSavedRequest } from "@/lib/api";
 import { X, Save } from "lucide-react";
+import { useToastStore } from "@/store/toastStore";
 
 interface SaveRequestModalProps {
   initialName: string;
@@ -13,6 +14,7 @@ interface SaveRequestModalProps {
 
 export default function SaveRequestModal({ initialName, payload, mode, onClose, onSuccess }: SaveRequestModalProps) {
   const { collections, fetchCollections } = useCollectionsStore();
+  const addToast = useToastStore((state) => state.addToast);
   
   const [name, setName] = useState(initialName || "Untitled Request");
   const [collectionId, setCollectionId] = useState<string>(
@@ -58,11 +60,13 @@ export default function SaveRequestModal({ initialName, payload, mode, onClose, 
       
       // Refresh sidebar
       await fetchCollections();
+      addToast("Request saved successfully", "success");
       
       // Callback to update the tab
       onSuccess(res.id, res.name);
     } catch (err: any) {
       setError(err.message || "Failed to save request");
+      addToast(err.message || "Failed to save request", "error");
       setIsSaving(false);
     }
   };

@@ -13,6 +13,7 @@ import VariableHighlightInput from "../common/VariableHighlightInput";
 import SaveRequestModal from "./SaveRequestModal";
 import { useCollectionsStore } from "@/store/collectionsStore";
 import { Zap } from "lucide-react";
+import { useToastStore } from "@/store/toastStore";
 
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
 
@@ -26,6 +27,7 @@ export default function RequestBuilder() {
   const activeEnvironmentId = useEnvironmentsStore((state) => state.activeEnvironmentId);
   const fetchHistory = useHistoryStore((state) => state.fetchHistory);
   const fetchCollections = useCollectionsStore((state) => state.fetchCollections);
+  const addToast = useToastStore((state) => state.addToast);
 
   const activeTab = tabs.find((t) => t.id === activeTabId);
 
@@ -201,12 +203,7 @@ export default function RequestBuilder() {
       updateTab(tabId, { response }); // isEdit is false by default
       await fetchHistory();
     } catch (err: any) {
-      updateTab(tabId, {
-        response: {
-          error: "Request Failed",
-          message: err.message || "An unexpected error occurred",
-        }
-      }); // isEdit is false by default
+      addToast("Couldn't reach the backend", "error");
     } finally {
       setIsSending(false);
     }
@@ -234,8 +231,9 @@ export default function RequestBuilder() {
       await updateSavedRequest(activeTab.savedRequestId, dataToSave);
       updateTab(activeTab.id, { isDirty: false }); // explicit isDirty false, isEdit=false
       await fetchCollections();
-    } catch (e) {
-      console.error("Failed to update saved request", e);
+      addToast("Request updated successfully", "success");
+    } catch (e: any) {
+      addToast(e.message || "Failed to update saved request", "error");
     }
   };
 

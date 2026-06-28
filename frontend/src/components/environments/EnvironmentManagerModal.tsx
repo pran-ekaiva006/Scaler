@@ -3,9 +3,11 @@ import { useEnvironmentsStore } from "@/store/environmentsStore";
 import KeyValueTable from "../common/KeyValueTable";
 import { KeyValueRow } from "@/lib/types";
 import { Plus, Trash2, Edit2, X, Save } from "lucide-react";
+import { useToastStore } from "@/store/toastStore";
 
 export default function EnvironmentManagerModal({ onClose }: { onClose: () => void }) {
   const { environments, addEnvironment, renameEnvironment, removeEnvironment, syncVariables } = useEnvironmentsStore();
+  const addToast = useToastStore((state) => state.addToast);
   const [selectedEnvId, setSelectedEnvId] = useState<number | null>(environments.length > 0 ? environments[0].id : null);
   
   const [isAdding, setIsAdding] = useState(false);
@@ -35,23 +37,38 @@ export default function EnvironmentManagerModal({ onClose }: { onClose: () => vo
 
   const handleAdd = async () => {
     if (!newEnvName.trim()) return;
-    await addEnvironment(newEnvName);
-    setIsAdding(false);
-    setNewEnvName("");
+    try {
+      await addEnvironment(newEnvName);
+      setIsAdding(false);
+      setNewEnvName("");
+      addToast("Environment created", "success");
+    } catch (e: any) {
+      addToast(e.message || "Failed to create environment", "error");
+    }
   };
 
   const handleRename = async (id: number) => {
     if (!editName.trim()) return;
-    await renameEnvironment(id, editName);
-    setEditingId(null);
-    setEditName("");
+    try {
+      await renameEnvironment(id, editName);
+      setEditingId(null);
+      setEditName("");
+      addToast("Environment renamed", "success");
+    } catch (e: any) {
+      addToast(e.message || "Failed to rename environment", "error");
+    }
   };
 
   const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this environment?")) {
-      await removeEnvironment(id);
-      if (selectedEnvId === id) {
-        setSelectedEnvId(null);
+      try {
+        await removeEnvironment(id);
+        if (selectedEnvId === id) {
+          setSelectedEnvId(null);
+        }
+        addToast("Environment deleted", "success");
+      } catch (e: any) {
+        addToast(e.message || "Failed to delete environment", "error");
       }
     }
   };
@@ -61,6 +78,9 @@ export default function EnvironmentManagerModal({ onClose }: { onClose: () => vo
     setIsSaving(true);
     try {
       await syncVariables(selectedEnvId, localVars);
+      addToast("Variables saved successfully", "success");
+    } catch (e: any) {
+      addToast(e.message || "Failed to save variables", "error");
     } finally {
       setIsSaving(false);
     }

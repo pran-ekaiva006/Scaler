@@ -46,6 +46,7 @@ export default function TabBar({
 
   return (
     <div
+      className="hide-scrollbar"
       style={{
         height: 36,
         minHeight: 36,
@@ -82,6 +83,7 @@ export default function TabBar({
               transition: "background 0.1s, color 0.1s",
               whiteSpace: "nowrap",
               maxWidth: 200,
+              flexShrink: 0,
               position: "relative",
             }}
           >
@@ -204,6 +206,7 @@ export default function TabBar({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          flexShrink: 0,
         }}
         onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
         onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}

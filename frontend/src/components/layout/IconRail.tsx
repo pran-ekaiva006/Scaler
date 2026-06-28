@@ -1,11 +1,16 @@
 "use client";
 
-import { Folder, History, Globe } from "lucide-react";
+import { Folder, History, Globe, Server, Activity, Book, Users, Settings } from "lucide-react";
 
 const RAIL_ICONS = [
   { id: "collections", label: "Collections", icon: <Folder size={20} strokeWidth={1.5} /> },
   { id: "history", label: "History", icon: <History size={20} strokeWidth={1.5} /> },
   { id: "environments", label: "Environments", icon: <Globe size={20} strokeWidth={1.5} /> },
+  { id: "mock_servers", label: "Mock Servers", icon: <Server size={20} strokeWidth={1.5} /> },
+  { id: "monitors", label: "Monitors", icon: <Activity size={20} strokeWidth={1.5} /> },
+  { id: "api_docs", label: "API Documentation", icon: <Book size={20} strokeWidth={1.5} /> },
+  { id: "team", label: "Team Workspaces", icon: <Users size={20} strokeWidth={1.5} /> },
+  { id: "settings", label: "Settings", icon: <Settings size={20} strokeWidth={1.5} /> },
 ];
 
 interface IconRailProps {
