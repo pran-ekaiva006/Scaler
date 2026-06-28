@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local Testing
+jest.config.mjs
+jest.setup.js
+__tests__/
+verify_*.js
+
