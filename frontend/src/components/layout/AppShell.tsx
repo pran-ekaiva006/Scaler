@@ -14,11 +14,8 @@ import { Zap } from "lucide-react";
 import { useCollectionsStore } from "@/store/collectionsStore";
 import { useEnvironmentsStore } from "@/store/environmentsStore";
 import { useHistoryStore } from "@/store/historyStore";
-
-const PLACEHOLDER_TABS = [
-  { id: "1", name: "Get Users", method: "GET" },
-  { id: "2", name: "Create Post", method: "POST", isDirty: true },
-];
+import RequestBuilder from "../request-builder/RequestBuilder";
+import { useTabsStore } from "@/store/tabsStore";
 
 export default function AppShell({
   children,
@@ -26,16 +23,11 @@ export default function AppShell({
   children?: React.ReactNode;
 }) {
   const [sidebarTab, setSidebarTab] = useState("collections");
-  const [activeTabId, setActiveTabId] = useState<string | null>("1");
-  const [tabs, setTabs] = useState(PLACEHOLDER_TABS);
-
-  const handleTabClose = (id: string) => {
-    const remaining = tabs.filter((t) => t.id !== id);
-    setTabs(remaining);
-    if (activeTabId === id) {
-      setActiveTabId(remaining.length > 0 ? remaining[0].id : null);
-    }
-  };
+  
+  const tabs = useTabsStore((state) => state.tabs);
+  const activeTabId = useTabsStore((state) => state.activeTabId);
+  const setActiveTabId = useTabsStore((state) => state.setActiveTab);
+  const handleTabClose = useTabsStore((state) => state.closeTab);
 
   const fetchCollections = useCollectionsStore((state) => state.fetchCollections);
   const fetchEnvironments = useEnvironmentsStore((state) => state.fetchEnvironments);
@@ -114,7 +106,7 @@ export default function AppShell({
                 flexDirection: "column",
               }}
             >
-              {children || <EmptyState />}
+              {activeTabId ? <RequestBuilder /> : <EmptyState />}
             </div>
           </div>
         </Panel>
