@@ -29,6 +29,8 @@ export default function AppShell({
   const activeTabId = useTabsStore((state) => state.activeTabId);
   const setActiveTabId = useTabsStore((state) => state.setActiveTab);
   const handleTabClose = useTabsStore((state) => state.closeTab);
+  const createBlankTab = useTabsStore((state) => state.createBlankTab);
+  const openSaveModal = useTabsStore((state) => state.openSaveModal);
 
   const fetchCollections = useCollectionsStore((state) => state.fetchCollections);
   const fetchEnvironments = useEnvironmentsStore((state) => state.fetchEnvironments);
@@ -90,12 +92,13 @@ export default function AppShell({
             {/* Top Bar */}
             <TopBar />
 
-            {/* Tab Bar */}
             <TabBar
               tabs={tabs}
               activeTabId={activeTabId}
               onTabClick={setActiveTabId}
               onTabClose={handleTabClose}
+              onNewTab={createBlankTab}
+              onSaveAs={(id) => openSaveModal("saveAs", id)}
             />
 
             {/* Main Content Area */}
@@ -107,22 +110,18 @@ export default function AppShell({
                 flexDirection: "column",
               }}
             >
-              {activeTabId ? (
-                <PanelGroup orientation="vertical" style={{ flex: 1 }}>
-                  <Panel id="request" defaultSize={50} minSize={20}>
-                    <RequestBuilder />
-                  </Panel>
-                  <PanelResizeHandle style={{ height: "4px", background: "var(--border-subtle)", cursor: "row-resize" }} />
-                  <Panel id="response" defaultSize={50} minSize={20}>
-                    {(() => {
-                      const activeTab = tabs.find(t => t.id === activeTabId);
-                      return <ResponseViewer response={activeTab?.response} />;
-                    })()}
-                  </Panel>
-                </PanelGroup>
-              ) : (
-                <EmptyState />
-              )}
+              <PanelGroup orientation="vertical" style={{ flex: 1 }}>
+                <Panel id="request" defaultSize={50} minSize={20}>
+                  <RequestBuilder />
+                </Panel>
+                <PanelResizeHandle style={{ height: "4px", background: "var(--border-subtle)", cursor: "row-resize" }} />
+                <Panel id="response" defaultSize={50} minSize={20}>
+                  {(() => {
+                    const activeTab = tabs.find(t => t.id === activeTabId);
+                    return <ResponseViewer response={activeTab?.response} noTabOpen={!activeTab} />;
+                  })()}
+                </Panel>
+              </PanelGroup>
             </div>
           </div>
         </Panel>
@@ -131,31 +130,4 @@ export default function AppShell({
   );
 }
 
-function EmptyState() {
-  return (
-    <div
-      style={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 16,
-        color: "var(--text-muted)",
-      }}
-    >
-      <div style={{ opacity: 0.3, color: "var(--text-secondary)" }}>
-        <Zap size={64} strokeWidth={1} />
-      </div>
-      <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text-secondary)" }}>
-        Ready to send a request
-      </div>
-      <div style={{ fontSize: 13 }}>
-        Select a request from the sidebar, or create a new one
-      </div>
-      <button className="btn-send" style={{ marginTop: 8 }}>
-        + New Request
-      </button>
-    </div>
-  );
-}
+

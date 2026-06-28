@@ -14,6 +14,8 @@ interface TabBarProps {
   activeTabId: string | null;
   onTabClick: (id: string) => void;
   onTabClose: (id: string) => void;
+  onNewTab: () => void;
+  onSaveAs: (id: string) => void;
 }
 
 export default function TabBar({
@@ -21,8 +23,26 @@ export default function TabBar({
   activeTabId,
   onTabClick,
   onTabClose,
+  onNewTab,
+  onSaveAs,
 }: TabBarProps) {
-  if (tabs.length === 0) return null;
+  const [menuOpenId, setMenuOpenId] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = () => setMenuOpenId(null);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  const handleClose = (e: React.MouseEvent, tab: Tab) => {
+    e.stopPropagation();
+    if (tab.isDirty) {
+      if (!window.confirm("Unsaved changes — close anyway?")) {
+        return;
+      }
+    }
+    onTabClose(tab.id);
+  };
 
   return (
     <div
@@ -82,11 +102,71 @@ export default function TabBar({
                 }}
               />
             )}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onTabClose(tab.id);
-              }}
+              {/* Dropdown Menu */}
+              {isActive && (
+                <div style={{ position: "relative" }}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMenuOpenId(menuOpenId === tab.id ? null : tab.id);
+                    }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "var(--text-muted)",
+                      cursor: "pointer",
+                      fontSize: 14,
+                      padding: "0 4px",
+                      borderRadius: "var(--radius-sm)",
+                    }}
+                  >
+                    ⋮
+                  </button>
+                  
+                  {menuOpenId === tab.id && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "100%",
+                        right: 0,
+                        marginTop: 4,
+                        background: "var(--bg-panel)",
+                        border: "1px solid var(--border-default)",
+                        borderRadius: "var(--radius-md)",
+                        boxShadow: "0 10px 15px -3px rgba(0,0,0,0.5)",
+                        zIndex: 50,
+                        minWidth: 120,
+                        overflow: "hidden"
+                      }}
+                    >
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMenuOpenId(null);
+                          onSaveAs(tab.id);
+                        }}
+                        style={{
+                          width: "100%",
+                          textAlign: "left",
+                          background: "none",
+                          border: "none",
+                          padding: "8px 12px",
+                          fontSize: 12,
+                          color: "var(--text-primary)",
+                          cursor: "pointer",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-hover)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+                      >
+                        Save As...
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <button
+                onClick={(e) => handleClose(e, tab)}
               style={{
                 background: "none",
                 border: "none",
@@ -110,6 +190,26 @@ export default function TabBar({
           </div>
         );
       })}
+
+      {/* New Tab Button */}
+      <button
+        onClick={onNewTab}
+        style={{
+          background: "none",
+          border: "none",
+          color: "var(--text-secondary)",
+          cursor: "pointer",
+          padding: "0 16px",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
+        onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+      >
+        +
+      </button>
     </div>
   );
 }

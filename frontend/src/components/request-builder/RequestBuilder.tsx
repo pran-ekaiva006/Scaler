@@ -7,9 +7,12 @@ import KeyValueTable from "../common/KeyValueTable";
 import { Play, Save, Loader2 } from "lucide-react";
 import { useEnvironmentsStore } from "@/store/environmentsStore";
 import { useHistoryStore } from "@/store/historyStore";
-import { sendProxyRequest } from "@/lib/api";
+import { sendProxyRequest, updateSavedRequest } from "@/lib/api";
 import { ProxySendPayload } from "@/lib/types";
 import VariableHighlightInput from "../common/VariableHighlightInput";
+import SaveRequestModal from "./SaveRequestModal";
+import { useCollectionsStore } from "@/store/collectionsStore";
+import { Zap } from "lucide-react";
 
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
 
@@ -17,8 +20,12 @@ export default function RequestBuilder() {
   const activeTabId = useTabsStore((state) => state.activeTabId);
   const tabs = useTabsStore((state) => state.tabs);
   const updateTab = useTabsStore((state) => state.updateTab);
+  const saveModalConfig = useTabsStore((state) => state.saveModalConfig);
+  const openSaveModal = useTabsStore((state) => state.openSaveModal);
+  const closeSaveModal = useTabsStore((state) => state.closeSaveModal);
   const activeEnvironmentId = useEnvironmentsStore((state) => state.activeEnvironmentId);
   const fetchHistory = useHistoryStore((state) => state.fetchHistory);
+  const fetchCollections = useCollectionsStore((state) => state.fetchCollections);
 
   const activeTab = tabs.find((t) => t.id === activeTabId);
 
@@ -56,15 +63,34 @@ export default function RequestBuilder() {
 
   if (!activeTab) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "var(--text-muted)" }}>
-        Open a request to start building.
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 16,
+          color: "var(--text-muted)",
+          height: "100%",
+        }}
+      >
+        <div style={{ opacity: 0.3, color: "var(--text-secondary)" }}>
+          <Zap size={64} strokeWidth={1} />
+        </div>
+        <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text-secondary)" }}>
+          Ready to send a request
+        </div>
+        <div style={{ fontSize: 13 }}>
+          Select a request from the sidebar, or create a new one
+        </div>
       </div>
     );
   }
 
   const handleUrlBlur = () => {
     if (!activeTab) return;
-    updateTab(activeTab.id, { url: urlInput });
+    updateTab(activeTab.id, { url: urlInput }, true);
     try {
       const urlObj = new URL(urlInput);
       const searchParams = urlObj.searchParams;
@@ -73,7 +99,7 @@ export default function RequestBuilder() {
         newParams.push({ key, value, enabled: true });
       });
       const disabledParams = activeTab.params.filter(p => p.enabled === false);
-      updateTab(activeTab.id, { params: [...newParams, ...disabledParams] });
+      updateTab(activeTab.id, { params: [...newParams, ...disabledParams] }, true);
     } catch (e) {
       if (urlInput.includes("?")) {
         const queryStr = urlInput.split("?")[1];
@@ -83,13 +109,13 @@ export default function RequestBuilder() {
           newParams.push({ key, value, enabled: true });
         });
         const disabledParams = activeTab.params.filter(p => p.enabled === false);
-        updateTab(activeTab.id, { params: [...newParams, ...disabledParams] });
+        updateTab(activeTab.id, { params: [...newParams, ...disabledParams] }, true);
       }
     }
   };
 
   const handleParamsChange = (newParams: KeyValueRow[]) => {
-    updateTab(activeTab.id, { params: newParams });
+    updateTab(activeTab.id, { params: newParams }, true);
     try {
       let baseUrl = urlInput.split("?")[0];
       const enabledParams = newParams.filter(p => p.enabled !== false && p.key);
@@ -97,10 +123,10 @@ export default function RequestBuilder() {
         const searchParams = new URLSearchParams();
         enabledParams.forEach(p => searchParams.append(p.key, p.value));
         const newUrl = `${baseUrl}?${searchParams.toString()}`;
-        updateTab(activeTab.id, { url: newUrl });
+        updateTab(activeTab.id, { url: newUrl }, true);
         setUrlInput(newUrl);
       } else {
-        updateTab(activeTab.id, { url: baseUrl });
+        updateTab(activeTab.id, { url: baseUrl }, true);
         setUrlInput(baseUrl);
       }
     } catch (e) {
@@ -109,35 +135,35 @@ export default function RequestBuilder() {
   };
 
   const handleHeadersChange = (newHeaders: KeyValueRow[]) => {
-    updateTab(activeTab.id, { headers: newHeaders });
+    updateTab(activeTab.id, { headers: newHeaders }, true);
   };
 
   const handleBodyTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    updateTab(activeTab.id, { body_type: e.target.value });
+    updateTab(activeTab.id, { body_type: e.target.value }, true);
   };
   
   const handleBodyRawContentChange = (content: string) => {
     const currentBody = activeTab.body || {};
-    updateTab(activeTab.id, { body: { ...currentBody, raw_content: content } });
+    updateTab(activeTab.id, { body: { ...currentBody, raw_content: content } }, true);
   };
   
   const handleBodyRawContentTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const currentBody = activeTab.body || {};
-    updateTab(activeTab.id, { body: { ...currentBody, raw_content_type: e.target.value } });
+    updateTab(activeTab.id, { body: { ...currentBody, raw_content_type: e.target.value } }, true);
   };
   
   const handleBodyFormDataChange = (formData: KeyValueRow[]) => {
     const currentBody = activeTab.body || {};
-    updateTab(activeTab.id, { body: { ...currentBody, form_data: formData } });
+    updateTab(activeTab.id, { body: { ...currentBody, form_data: formData } }, true);
   };
 
   const handleAuthTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    updateTab(activeTab.id, { auth_type: e.target.value });
+    updateTab(activeTab.id, { auth_type: e.target.value }, true);
   };
 
   const handleAuthUpdate = (field: keyof Auth, value: string) => {
     const currentAuth = activeTab.auth || {};
-    updateTab(activeTab.id, { auth: { ...currentAuth, [field]: value } });
+    updateTab(activeTab.id, { auth: { ...currentAuth, [field]: value } }, true);
   };
 
   const handleSend = async () => {
@@ -172,7 +198,7 @@ export default function RequestBuilder() {
 
     try {
       const response = await sendProxyRequest(payload);
-      updateTab(tabId, { response });
+      updateTab(tabId, { response }); // isEdit is false by default
       await fetchHistory();
     } catch (err: any) {
       updateTab(tabId, {
@@ -180,9 +206,36 @@ export default function RequestBuilder() {
           error: "Request Failed",
           message: err.message || "An unexpected error occurred",
         }
-      });
+      }); // isEdit is false by default
     } finally {
       setIsSending(false);
+    }
+  };
+
+  const handleSaveBtnClick = async () => {
+    if (!activeTab.savedRequestId) {
+      openSaveModal("save", activeTab.id);
+      return;
+    }
+    
+    // Direct PUT update
+    try {
+      const dataToSave = {
+        name: activeTab.name,
+        method: activeTab.method,
+        url: activeTab.url,
+        params: activeTab.params,
+        headers: activeTab.headers,
+        body_type: activeTab.body_type,
+        body: activeTab.body || undefined,
+        auth_type: activeTab.auth_type,
+        auth: activeTab.auth || undefined,
+      };
+      await updateSavedRequest(activeTab.savedRequestId, dataToSave);
+      updateTab(activeTab.id, { isDirty: false }); // explicit isDirty false, isEdit=false
+      await fetchCollections();
+    } catch (e) {
+      console.error("Failed to update saved request", e);
     }
   };
 
@@ -192,7 +245,7 @@ export default function RequestBuilder() {
         <div style={{ display: "flex", flex: 1, border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
           <select
             value={activeTab.method}
-            onChange={(e) => updateTab(activeTab.id, { method: e.target.value })}
+            onChange={(e) => updateTab(activeTab.id, { method: e.target.value }, true)}
             className={`method-${activeTab.method}`}
             style={{
               background: "var(--bg-input)",
@@ -241,13 +294,14 @@ export default function RequestBuilder() {
         </button>
 
         <button
+          onClick={handleSaveBtnClick}
           style={{
             background: "var(--bg-panel)",
             border: "1px solid var(--border-default)",
             color: activeTab.isDirty ? "var(--text-primary)" : "var(--text-muted)",
             padding: "0 12px",
             borderRadius: "var(--radius-md)",
-            cursor: activeTab.isDirty ? "pointer" : "default",
+            cursor: "pointer",
             display: "flex",
             alignItems: "center",
             gap: 6,
@@ -259,6 +313,19 @@ export default function RequestBuilder() {
           Save
         </button>
       </div>
+
+      {saveModalConfig && saveModalConfig.isOpen && saveModalConfig.tabId === activeTab.id && (
+        <SaveRequestModal
+          mode={saveModalConfig.mode}
+          initialName={activeTab.name}
+          payload={activeTab}
+          onClose={closeSaveModal}
+          onSuccess={(savedRequestId, newName) => {
+            updateTab(activeTab.id, { savedRequestId, name: newName, isDirty: false }); // explicit isDirty false
+            closeSaveModal();
+          }}
+        />
+      )}
 
       <div style={{ display: "flex", padding: "0 16px", borderBottom: "1px solid var(--border-subtle)" }}>
         {["Params", "Headers", "Body", "Auth"].map((t) => (

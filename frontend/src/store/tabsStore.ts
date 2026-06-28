@@ -22,8 +22,12 @@ interface TabsState {
   activeTabId: string | null;
   openTab: (tab: Tab) => void;
   closeTab: (id: string) => void;
-  updateTab: (id: string, updates: Partial<Tab>) => void;
+  updateTab: (id: string, updates: Partial<Tab>, isEdit?: boolean) => void;
   setActiveTab: (id: string) => void;
+  createBlankTab: () => void;
+  saveModalConfig: { isOpen: boolean; mode: "save" | "saveAs"; tabId: string } | null;
+  openSaveModal: (mode: "save" | "saveAs", tabId: string) => void;
+  closeSaveModal: () => void;
 }
 
 export const useTabsStore = create<TabsState>((set) => ({
@@ -37,27 +41,66 @@ export const useTabsStore = create<TabsState>((set) => ({
         return { activeTabId: tab.id };
       }
       return {
-        tabs: [...state.tabs, tab],
+        tabs: [...state.tabs, { ...tab, isDirty: false }],
         activeTabId: tab.id,
       };
     }),
 
   closeTab: (id) =>
     set((state) => {
+      const closingIndex = state.tabs.findIndex((t) => t.id === id);
       const newTabs = state.tabs.filter((t) => t.id !== id);
       let nextActive = state.activeTabId;
       if (state.activeTabId === id) {
-        nextActive = newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null;
+        if (newTabs.length > 0) {
+          // Fallback to the left neighbor, or the first item if we closed the first tab
+          const newIndex = Math.max(0, closingIndex - 1);
+          nextActive = newTabs[newIndex].id;
+        } else {
+          nextActive = null;
+        }
       }
       return { tabs: newTabs, activeTabId: nextActive };
     }),
 
-  updateTab: (id, updates) =>
+  updateTab: (id, updates, isEdit = false) =>
     set((state) => ({
-      tabs: state.tabs.map((t) =>
-        t.id === id ? { ...t, ...updates, isDirty: true } : t
-      ),
+      tabs: state.tabs.map((t) => {
+        if (t.id === id) {
+          if (isEdit) {
+            return { ...t, ...updates, isDirty: true };
+          }
+          return { ...t, ...updates };
+        }
+        return t;
+      }),
     })),
 
   setActiveTab: (id) => set({ activeTabId: id }),
+
+  createBlankTab: () =>
+    set((state) => {
+      const id = Date.now().toString();
+      const newTab: Tab = {
+        id,
+        name: "Untitled Request",
+        method: "GET",
+        url: "",
+        params: [],
+        headers: [],
+        body_type: "none",
+        body: null,
+        auth_type: "none",
+        auth: null,
+        isDirty: false,
+      };
+      return {
+        tabs: [...state.tabs, newTab],
+        activeTabId: id,
+      };
+    }),
+
+  saveModalConfig: null,
+  openSaveModal: (mode, tabId) => set({ saveModalConfig: { isOpen: true, mode, tabId } }),
+  closeSaveModal: () => set({ saveModalConfig: null }),
 }));
