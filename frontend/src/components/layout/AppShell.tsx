@@ -15,6 +15,7 @@ import { useCollectionsStore } from "@/store/collectionsStore";
 import { useEnvironmentsStore } from "@/store/environmentsStore";
 import { useHistoryStore } from "@/store/historyStore";
 import RequestBuilder from "../request-builder/RequestBuilder";
+import ResponseViewer from "../response-viewer/ResponseViewer";
 import { useTabsStore } from "@/store/tabsStore";
 
 export default function AppShell({
@@ -101,12 +102,27 @@ export default function AppShell({
             <div
               style={{
                 flex: 1,
-                overflow: "auto",
+                overflow: "hidden", // must be hidden for PanelGroup to work right
                 display: "flex",
                 flexDirection: "column",
               }}
             >
-              {activeTabId ? <RequestBuilder /> : <EmptyState />}
+              {activeTabId ? (
+                <PanelGroup orientation="vertical" style={{ flex: 1 }}>
+                  <Panel id="request" defaultSize={50} minSize={20}>
+                    <RequestBuilder />
+                  </Panel>
+                  <PanelResizeHandle style={{ height: "4px", background: "var(--border-subtle)", cursor: "row-resize" }} />
+                  <Panel id="response" defaultSize={50} minSize={20}>
+                    {(() => {
+                      const activeTab = tabs.find(t => t.id === activeTabId);
+                      return <ResponseViewer response={activeTab?.response} />;
+                    })()}
+                  </Panel>
+                </PanelGroup>
+              ) : (
+                <EmptyState />
+              )}
             </div>
           </div>
         </Panel>

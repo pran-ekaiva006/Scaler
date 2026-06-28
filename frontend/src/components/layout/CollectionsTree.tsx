@@ -24,7 +24,9 @@ export default function CollectionsTree() {
   const [expandedFolders, setExpandedFolders] = useState<Set<number>>(new Set());
 
   // Modal state
-  const [modalType, setModalType] = useState<"collection" | "folder" | "request" | null>(null);
+  const [modalType, setModalType] = useState<
+    "collection" | "folder" | "request" | "request-folder" | null
+  >(null);
   const [modalTargetId, setModalTargetId] = useState<number | null>(null);
   const [modalInput, setModalInput] = useState("");
 

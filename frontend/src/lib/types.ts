@@ -106,14 +106,26 @@ export interface ProxySendPayload {
   request_id?: number;
 }
 
-export interface ProxyResponse {
-  status?: number;
-  headers?: Record<string, string>;
-  body?: string;
-  time_ms: number;
-  size_bytes?: number;
-  is_json?: boolean;
-  error?: string;
-  message?: string;
-  history_id?: number;
-}
+export type ProxyResponse = 
+  | { 
+      status: number; 
+      headers: Record<string, string>; 
+      body: string; 
+      time_ms: number; 
+      size_bytes: number; 
+      is_json?: boolean; 
+      history_id?: number; 
+      error?: never; 
+      message?: never; 
+    }
+  | { 
+      error: string; 
+      message: string; 
+      status?: never; 
+      headers?: never; 
+      body?: never; 
+      time_ms?: never; 
+      size_bytes?: never; 
+      is_json?: never; 
+      history_id?: never; 
+    };

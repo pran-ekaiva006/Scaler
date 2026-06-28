@@ -4,7 +4,11 @@ import React, { useState, useEffect } from "react";
 import { useTabsStore } from "@/store/tabsStore";
 import { KeyValueRow, RequestBody, Auth } from "@/lib/types";
 import KeyValueTable from "../common/KeyValueTable";
-import { Play, Save } from "lucide-react";
+import { Play, Save, Loader2 } from "lucide-react";
+import { useEnvironmentsStore } from "@/store/environmentsStore";
+import { useHistoryStore } from "@/store/historyStore";
+import { sendProxyRequest } from "@/lib/api";
+import { ProxySendPayload } from "@/lib/types";
 
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
 
@@ -12,6 +16,8 @@ export default function RequestBuilder() {
   const activeTabId = useTabsStore((state) => state.activeTabId);
   const tabs = useTabsStore((state) => state.tabs);
   const updateTab = useTabsStore((state) => state.updateTab);
+  const activeEnvironmentId = useEnvironmentsStore((state) => state.activeEnvironmentId);
+  const fetchHistory = useHistoryStore((state) => state.fetchHistory);
 
   const activeTab = tabs.find((t) => t.id === activeTabId);
 
@@ -133,6 +139,52 @@ export default function RequestBuilder() {
     updateTab(activeTab.id, { auth: { ...currentAuth, [field]: value } });
   };
 
+  const handleSend = async () => {
+    if (!activeTab || isSending) return;
+    
+    setIsSending(true);
+    const tabId = activeTab.id; // capture to avoid race conditions
+    
+    // Filter out file types from form_data to prevent JSON.stringify crash
+    let cleanFormData = undefined;
+    if (activeTab.body_type === "form-data" && activeTab.body?.form_data) {
+      cleanFormData = activeTab.body.form_data.filter(row => row.type !== "file");
+    } else {
+      cleanFormData = activeTab.body?.form_data;
+    }
+
+    const payload: ProxySendPayload = {
+      method: activeTab.method,
+      url: activeTab.url,
+      params: activeTab.params,
+      headers: activeTab.headers,
+      body_type: activeTab.body_type,
+      body: activeTab.body ? {
+        ...activeTab.body,
+        form_data: cleanFormData
+      } : undefined,
+      auth_type: activeTab.auth_type,
+      auth: activeTab.auth || undefined,
+      environment_id: activeEnvironmentId ?? undefined,
+      request_id: activeTab.savedRequestId ?? undefined,
+    };
+
+    try {
+      const response = await sendProxyRequest(payload);
+      updateTab(tabId, { response });
+      await fetchHistory();
+    } catch (err: any) {
+      updateTab(tabId, {
+        response: {
+          error: "Request Failed",
+          message: err.message || "An unexpected error occurred",
+        }
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
       <div style={{ display: "flex", padding: "12px 16px", gap: 8, borderBottom: "1px solid var(--border-subtle)" }}>
@@ -181,10 +233,15 @@ export default function RequestBuilder() {
         <button
           className="btn-send"
           disabled={isSending}
+          onClick={handleSend}
           style={{ display: "flex", alignItems: "center", gap: 6 }}
         >
-          <Play size={14} fill="currentColor" />
-          <span>Send</span>
+          {isSending ? (
+            <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} />
+          ) : (
+            <Play size={14} fill="currentColor" />
+          )}
+          <span>{isSending ? "Sending..." : "Send"}</span>
         </button>
 
         <button

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { KeyValueRow, RequestBody, Auth } from "../lib/types";
+import { KeyValueRow, RequestBody, Auth, ProxyResponse } from "../lib/types";
 
 export interface Tab {
   id: string; // Unique ID for the tab (could be temporary UUID or savedRequest.id)
@@ -14,6 +14,7 @@ export interface Tab {
   auth_type: string;
   auth: Auth | null;
   isDirty: boolean;
+  response?: ProxyResponse;
 }
 
 interface TabsState {
