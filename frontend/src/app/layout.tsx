@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import ServerWakeupBanner from "@/components/layout/ServerWakeupBanner";
 import "./globals.css";
 
 const inter = Inter({
@@ -29,6 +30,7 @@ export default function RootLayout({
       style={{ height: "100%", overflow: "hidden" }}
     >
       <body style={{ margin: 0, height: "100%", overflow: "hidden" }}>
+        <ServerWakeupBanner />
         {children}
       </body>
     </html>
