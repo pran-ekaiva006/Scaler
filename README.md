@@ -2,6 +2,16 @@
 
 A functional clone of Postman built with Next.js and FastAPI, featuring a request builder, a real backend proxy, collections, environments, and history.
 
+## 🚀 Live Demo & Testing
+
+**[Try the Live App Here](https://scaler-postman.vercel.app/)**
+
+**How to test this quickly (60 seconds):**
+1. Click the **Live App** link above.
+2. In the left sidebar, expand **Collections** -> **JSONPlaceholder Demo** -> **Posts**
+3. Click on the **"Create Post"** request.
+4. Click the orange **Send** button. 
+5. You will see a real HTTP `201 Created` response with the created JSON payload returned from the external server, all proxied successfully through the live backend!
 ## What this actually does
 
 This application allows you to build and send real HTTP requests to external servers. Instead of making requests directly from the browser, they are routed through a FastAPI backend proxy to bypass CORS restrictions. The app organizes requests into collections and folders, resolves `{{variables}}` using active environments, and logs all executed requests to a history tab. Everything is persisted locally using an SQLite database with a custom schema designed specifically for this project.
@@ -9,7 +19,8 @@ This application allows you to build and send real HTTP requests to external ser
 ## Screenshots
 
 Screenshots below — add a GIF of the send flow if you have time, it does more than three paragraphs would.
-<!-- TODO: add screenshot/gif here -->
+
+![Postman Clone App Screenshot](./screenshot.png)
 
 ## Tech Stack
 
