@@ -176,6 +176,3 @@ npm run dev
 - A responsive mobile layout (the current layout assumes a desktop-class screen).
 - Code snippet generation (cURL, Python, JS) for saved requests.
 
-## Built with AI assistance
-
-AI tools were used heavily for implementation per the assignment's explicit allowance. Every line of code generated was reviewed for architectural soundness and can be fully explained during the evaluation interview.
