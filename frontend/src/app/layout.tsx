@@ -13,9 +13,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Postman Clone — API Testing Tool",
-  description:
-    "Build, test, and debug HTTP requests with a beautiful Postman-like interface",
+  title: "Postman",
+  description: "A functional clone of Postman built with Next.js and FastAPI",
 };
 
 export default function RootLayout({

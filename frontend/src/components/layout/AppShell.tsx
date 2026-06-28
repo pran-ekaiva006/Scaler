@@ -74,11 +74,22 @@ export default function AppShell({
       {["collections", "history", "environments"].includes(sidebarTab) ? (
         <PanelGroup orientation="horizontal" style={{ flex: 1 }}>
           {/* Sidebar Panel */}
-          <Panel defaultSize={20} minSize={15} maxSize={35} id="sidebar">
+          <Panel defaultSize={25} minSize={20} id="sidebar">
             <Sidebar activeTab={sidebarTab} />
           </Panel>
 
-          <PanelResizeHandle />
+          <PanelResizeHandle
+            style={{
+              width: "8px",
+              background: "transparent",
+              cursor: "col-resize",
+              position: "relative",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <div style={{ width: "2px", height: "100%", background: "var(--border-subtle)" }} />
+          </PanelResizeHandle>
 
           {/* Main Panel */}
           <Panel id="main">
@@ -88,6 +99,7 @@ export default function AppShell({
                 display: "flex",
                 flexDirection: "column",
                 background: "var(--bg-panel)",
+                minWidth: 0,
               }}
             >
               <TopBar />
@@ -112,7 +124,18 @@ export default function AppShell({
                   <Panel id="request" defaultSize={50} minSize={20}>
                     <RequestBuilder />
                   </Panel>
-                  <PanelResizeHandle style={{ height: "4px", background: "var(--border-subtle)", cursor: "row-resize" }} />
+                  <PanelResizeHandle
+                    style={{
+                      height: "8px",
+                      background: "transparent",
+                      cursor: "row-resize",
+                      position: "relative",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <div style={{ height: "2px", width: "100%", background: "var(--border-subtle)" }} />
+                  </PanelResizeHandle>
                   <Panel id="response" defaultSize={50} minSize={20}>
                     {(() => {
                       const activeTab = tabs.find((t) => t.id === activeTabId);

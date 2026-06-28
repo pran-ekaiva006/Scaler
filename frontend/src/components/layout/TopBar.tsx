@@ -61,7 +61,7 @@ export default function TopBar() {
             color: "var(--text-primary)",
           }}
         >
-          Postman Clone
+          Postman
         </span>
       </div>
 

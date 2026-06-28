@@ -118,13 +118,11 @@ html, body {
    ============================================================ */
 
 [data-panel-resize-handle-id] {
-  width: 3px !important;
-  background: var(--border-default);
   transition: background 0.15s ease;
 }
 [data-panel-resize-handle-id]:hover,
 [data-panel-resize-handle-id][data-resize-handle-state="drag"] {
-  background: var(--accent-orange);
+  background: var(--accent-orange-glow);
 }
 
 /* ============================================================

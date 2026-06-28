@@ -19,8 +19,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Postman Clone API",
-    description="Proxy-based HTTP client backend",
+    title="Postman Backend",
+    description="Backend API for the Postman application.",
     version="0.1.0",
     lifespan=lifespan,
 )
