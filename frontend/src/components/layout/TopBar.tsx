@@ -1,9 +1,28 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Zap } from "lucide-react";
+import { useEnvironmentsStore } from "@/store/environmentsStore";
+import EnvironmentManagerModal from "../environments/EnvironmentManagerModal";
 
 export default function TopBar() {
+  const { environments, activeEnvironmentId, activateEnvironment } = useEnvironmentsStore();
+  const [isManagerOpen, setIsManagerOpen] = useState(false);
+
+  const handleEnvironmentChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    if (val === "manage") {
+      setIsManagerOpen(true);
+      return;
+    }
+    
+    const envId = val ? parseInt(val, 10) : null;
+    try {
+      await activateEnvironment(envId);
+    } catch (err) {
+      console.error("Failed to activate environment:", err);
+    }
+  };
   return (
     <div
       style={{
@@ -65,13 +84,21 @@ export default function TopBar() {
             cursor: "pointer",
             minWidth: 140,
           }}
-          defaultValue="production"
+          value={activeEnvironmentId === null ? "" : activeEnvironmentId.toString()}
+          onChange={handleEnvironmentChange}
         >
           <option value="">No Environment</option>
-          <option value="local">Local</option>
-          <option value="production">Production</option>
+          {environments.map((env) => (
+            <option key={env.id} value={env.id.toString()}>
+              {env.name}
+            </option>
+          ))}
+          <option disabled>──────────</option>
+          <option value="manage">Manage Environments...</option>
         </select>
       </div>
+
+      {isManagerOpen && <EnvironmentManagerModal onClose={() => setIsManagerOpen(false)} />}
     </div>
   );
 }

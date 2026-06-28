@@ -3,6 +3,7 @@
 import React from "react";
 import { Trash2 } from "lucide-react";
 import { KeyValueRow } from "@/lib/types";
+import VariableHighlightInput from "./VariableHighlightInput";
 
 interface KeyValueTableProps {
   rows: KeyValueRow[];
@@ -130,21 +131,16 @@ export default function KeyValueTable({ rows, onChange, showTypeToggle = false }
                   }}
                 />
               ) : (
-                <input
-                  type="text"
+                <VariableHighlightInput
                   placeholder="Value"
                   value={row.value}
-                  onChange={(e) => handleChange(index, "value", e.target.value)}
+                  onChange={(val) => handleChange(index, "value", val)}
                   style={{
                     flex: 1,
                     width: "100%",
                     padding: "6px 8px",
                     background: "transparent",
-                    border: "none",
-                    color: "var(--text-primary)",
-                    outline: "none",
                     fontSize: 12,
-                    fontFamily: "var(--font-mono)",
                   }}
                 />
               )}

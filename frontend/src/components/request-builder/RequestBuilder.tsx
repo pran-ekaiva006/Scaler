@@ -9,6 +9,7 @@ import { useEnvironmentsStore } from "@/store/environmentsStore";
 import { useHistoryStore } from "@/store/historyStore";
 import { sendProxyRequest } from "@/lib/api";
 import { ProxySendPayload } from "@/lib/types";
+import VariableHighlightInput from "../common/VariableHighlightInput";
 
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
 
@@ -209,23 +210,18 @@ export default function RequestBuilder() {
             ))}
           </select>
           
-          <input
+          <VariableHighlightInput
             id="url-input"
-            type="text"
             placeholder="Enter request URL"
             value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
+            onChange={(val) => setUrlInput(val)}
             onBlur={handleUrlBlur}
             onKeyDown={(e) => e.key === "Enter" && handleUrlBlur()}
             style={{
               flex: 1,
               background: "var(--bg-input)",
-              border: "none",
               padding: "0 12px",
-              color: "white",
               fontSize: 13,
-              outline: "none",
-              fontFamily: "var(--font-mono)",
             }}
           />
         </div>
