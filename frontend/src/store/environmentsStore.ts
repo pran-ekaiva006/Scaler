@@ -87,13 +87,12 @@ export const useEnvironmentsStore = create<EnvironmentsState>((set, get) => ({
 
   activateEnvironment: async (id: number | null) => {
     try {
-      const state = get();
-      if (state.activeEnvironmentId) {
-        // Deactivate current
-        await updateEnvironment(state.activeEnvironmentId, { is_active: false });
-      }
-      if (id) {
-        // Activate new
+      if (id === null) {
+        const state = get();
+        if (state.activeEnvironmentId) {
+          await updateEnvironment(state.activeEnvironmentId, { is_active: false });
+        }
+      } else {
         await updateEnvironment(id, { is_active: true });
       }
       

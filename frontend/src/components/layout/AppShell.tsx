@@ -72,81 +72,70 @@ export default function AppShell({
 
       {/* Sidebar + Main Content or Placeholder Overlay */}
       {["collections", "history", "environments"].includes(sidebarTab) ? (
-        <PanelGroup orientation="horizontal" style={{ flex: 1 }}>
-          {/* Sidebar Panel */}
-          <Panel defaultSize={25} minSize={20} id="sidebar" style={{ minWidth: 250 }}>
+        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+          {/* Fixed Sidebar */}
+          <div style={{ width: 250, minWidth: 250, flexShrink: 0, height: "100%" }}>
             <Sidebar activeTab={sidebarTab} />
-          </Panel>
+          </div>
 
-          <PanelResizeHandle
+          {/* Divider */}
+          <div style={{ width: 1, background: "var(--border-subtle)", height: "100%" }} />
+
+          {/* Main Area */}
+          <div
             style={{
-              width: "8px",
-              background: "transparent",
-              cursor: "col-resize",
-              position: "relative",
+              flex: 1,
+              minWidth: 0,
               display: "flex",
-              justifyContent: "center",
+              flexDirection: "column",
+              background: "var(--bg-panel)",
+              height: "100%",
             }}
           >
-            <div style={{ width: "2px", height: "100%", background: "var(--border-subtle)" }} />
-          </PanelResizeHandle>
+            <TopBar />
+            <TabBar
+              tabs={tabs}
+              activeTabId={activeTabId}
+              onTabClick={setActiveTabId}
+              onTabClose={handleTabClose}
+              onNewTab={createBlankTab}
+              onSaveAs={(id) => openSaveModal("saveAs", id)}
+            />
 
-          {/* Main Panel */}
-          <Panel id="main">
             <div
               style={{
-                height: "100%",
+                flex: 1,
+                overflow: "hidden", // must be hidden for PanelGroup to work right
                 display: "flex",
                 flexDirection: "column",
-                background: "var(--bg-panel)",
-                minWidth: 0,
               }}
             >
-              <TopBar />
-              <TabBar
-                tabs={tabs}
-                activeTabId={activeTabId}
-                onTabClick={setActiveTabId}
-                onTabClose={handleTabClose}
-                onNewTab={createBlankTab}
-                onSaveAs={(id) => openSaveModal("saveAs", id)}
-              />
-
-              <div
-                style={{
-                  flex: 1,
-                  overflow: "hidden", // must be hidden for PanelGroup to work right
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <PanelGroup orientation="vertical" style={{ flex: 1 }}>
-                  <Panel id="request" defaultSize={50} minSize={20}>
-                    <RequestBuilder />
-                  </Panel>
-                  <PanelResizeHandle
-                    style={{
-                      height: "8px",
-                      background: "transparent",
-                      cursor: "row-resize",
-                      position: "relative",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <div style={{ height: "2px", width: "100%", background: "var(--border-subtle)" }} />
-                  </PanelResizeHandle>
-                  <Panel id="response" defaultSize={50} minSize={20}>
-                    {(() => {
-                      const activeTab = tabs.find((t) => t.id === activeTabId);
-                      return <ResponseViewer response={activeTab?.response} noTabOpen={!activeTab} />;
-                    })()}
-                  </Panel>
-                </PanelGroup>
-              </div>
+              <PanelGroup orientation="vertical" style={{ flex: 1 }}>
+                <Panel id="request" defaultSize={50} minSize={20}>
+                  <RequestBuilder />
+                </Panel>
+                <PanelResizeHandle
+                  style={{
+                    height: "8px",
+                    background: "transparent",
+                    cursor: "row-resize",
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <div style={{ height: "2px", width: "100%", background: "var(--border-subtle)" }} />
+                </PanelResizeHandle>
+                <Panel id="response" defaultSize={50} minSize={20}>
+                  {(() => {
+                    const activeTab = tabs.find((t) => t.id === activeTabId);
+                    return <ResponseViewer response={activeTab?.response} noTabOpen={!activeTab} />;
+                  })()}
+                </Panel>
+              </PanelGroup>
             </div>
-          </Panel>
-        </PanelGroup>
+          </div>
+        </div>
       ) : (
         <div style={{ flex: 1, background: "var(--bg-panel)", overflow: "hidden" }}>
           {sidebarTab === "settings" ? (
