@@ -72,26 +72,36 @@ export default function AppShell({
 
       {/* Sidebar + Main Content or Placeholder Overlay */}
       {["collections", "history", "environments"].includes(sidebarTab) ? (
-        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-          {/* Fixed Sidebar */}
-          <div style={{ width: 250, minWidth: 250, flexShrink: 0, height: "100%" }}>
+        <PanelGroup orientation="horizontal" style={{ flex: 1 }}>
+          {/* Sidebar Panel */}
+          <Panel defaultSize={25} minSize={20} id="sidebar" className="sidebar-panel">
             <Sidebar activeTab={sidebarTab} />
-          </div>
+          </Panel>
 
-          {/* Divider */}
-          <div style={{ width: 1, background: "var(--border-subtle)", height: "100%" }} />
-
-          {/* Main Area */}
-          <div
+          <PanelResizeHandle
             style={{
-              flex: 1,
-              minWidth: 0,
+              width: "8px",
+              background: "transparent",
+              cursor: "col-resize",
+              position: "relative",
               display: "flex",
-              flexDirection: "column",
-              background: "var(--bg-panel)",
-              height: "100%",
+              justifyContent: "center",
             }}
           >
+            <div style={{ width: "2px", height: "100%", background: "var(--border-subtle)" }} />
+          </PanelResizeHandle>
+
+          {/* Main Panel */}
+          <Panel id="main">
+            <div
+              style={{
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                background: "var(--bg-panel)",
+                minWidth: 0,
+              }}
+            >
             <TopBar />
             <TabBar
               tabs={tabs}
@@ -134,8 +144,8 @@ export default function AppShell({
                 </Panel>
               </PanelGroup>
             </div>
-          </div>
-        </div>
+          </Panel>
+        </PanelGroup>
       ) : (
         <div style={{ flex: 1, background: "var(--bg-panel)", overflow: "hidden" }}>
           {sidebarTab === "settings" ? (

@@ -215,3 +215,7 @@ html, body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+.sidebar-panel {
+  min-width: 250px !important;
+}
