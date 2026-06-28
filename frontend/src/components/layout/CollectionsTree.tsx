@@ -25,6 +25,15 @@ export default function CollectionsTree() {
   const [expandedCols, setExpandedCols] = useState<Set<number>>(new Set());
   const [expandedFolders, setExpandedFolders] = useState<Set<number>>(new Set());
 
+  React.useEffect(() => {
+    // Auto-expand everything on first load if it's currently collapsed
+    if (collections.length > 0 && expandedCols.size === 0) {
+      setExpandedCols(new Set(collections.map((c) => c.id)));
+      const folderIds = collections.flatMap(c => c.folders.map(f => f.id));
+      setExpandedFolders(new Set(folderIds));
+    }
+  }, [collections, expandedCols.size]);
+
   // Modal state
   const [modalType, setModalType] = useState<
     "collection" | "folder" | "request" | "request-folder" | null
