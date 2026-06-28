@@ -7,11 +7,12 @@ import { KeyValueRow } from "@/lib/types";
 interface KeyValueTableProps {
   rows: KeyValueRow[];
   onChange: (rows: KeyValueRow[]) => void;
+  showTypeToggle?: boolean;
 }
 
-export default function KeyValueTable({ rows, onChange }: KeyValueTableProps) {
+export default function KeyValueTable({ rows, onChange, showTypeToggle = false }: KeyValueTableProps) {
   // Always ensure there's at least one empty row at the bottom visually
-  const displayRows = [...rows, { key: "", value: "", enabled: true }];
+  const displayRows = [...rows, { key: "", value: "", enabled: true, type: "text" }];
 
   const handleChange = (index: number, field: keyof KeyValueRow, value: string | boolean) => {
     const isNewRow = index === rows.length;
@@ -19,7 +20,7 @@ export default function KeyValueTable({ rows, onChange }: KeyValueTableProps) {
     if (isNewRow) {
       // If they type in the empty row, add it to the real rows array
       if (value !== "") {
-        const newRow: KeyValueRow = { key: "", value: "", enabled: true, [field]: value };
+        const newRow: KeyValueRow = { key: "", value: "", enabled: true, type: "text", [field]: value };
         onChange([...rows, newRow]);
       }
       return;
@@ -89,23 +90,64 @@ export default function KeyValueTable({ rows, onChange }: KeyValueTableProps) {
             </div>
             
             {/* Value cell */}
-            <div style={{ flex: 1, borderRight: "1px solid var(--border-subtle)" }}>
-              <input
-                type="text"
-                placeholder="Value"
-                value={row.value}
-                onChange={(e) => handleChange(index, "value", e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "6px 8px",
-                  background: "transparent",
-                  border: "none",
-                  color: "var(--text-primary)",
-                  outline: "none",
-                  fontSize: 12,
-                  fontFamily: "var(--font-mono)",
-                }}
-              />
+            <div style={{ flex: 1, borderRight: "1px solid var(--border-subtle)", display: "flex", alignItems: "center" }}>
+              {showTypeToggle && (
+                <select
+                  value={row.type || "text"}
+                  onChange={(e) => handleChange(index, "type", e.target.value)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    borderRight: "1px solid var(--border-subtle)",
+                    color: "var(--text-secondary)",
+                    outline: "none",
+                    fontSize: 10,
+                    padding: "6px 4px",
+                    cursor: "pointer",
+                  }}
+                  disabled={isPlaceholder}
+                >
+                  <option value="text">Text</option>
+                  <option value="file">File</option>
+                </select>
+              )}
+              {row.type === "file" ? (
+                <input
+                  type="file"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleChange(index, "value", file.name); // Storing filename for now, in a real app we'd store the File object or handle upload
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: "6px 8px",
+                    background: "transparent",
+                    border: "none",
+                    color: "var(--text-primary)",
+                    fontSize: 12,
+                  }}
+                />
+              ) : (
+                <input
+                  type="text"
+                  placeholder="Value"
+                  value={row.value}
+                  onChange={(e) => handleChange(index, "value", e.target.value)}
+                  style={{
+                    flex: 1,
+                    width: "100%",
+                    padding: "6px 8px",
+                    background: "transparent",
+                    border: "none",
+                    color: "var(--text-primary)",
+                    outline: "none",
+                    fontSize: 12,
+                    fontFamily: "var(--font-mono)",
+                  }}
+                />
+              )}
             </div>
 
             {/* Delete button */}

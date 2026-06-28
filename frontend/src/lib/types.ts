@@ -2,6 +2,7 @@ export interface KeyValueRow {
   key: string;
   value: string;
   enabled?: boolean;
+  type?: string; // e.g. "text" | "file"
 }
 
 export interface RequestBody {
