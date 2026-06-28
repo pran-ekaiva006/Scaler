@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables / .env file."""
 
     DATABASE_URL: str = "sqlite+aiosqlite:///./postman_clone.db"
+    TURSO_DATABASE_URL: str | None = None
+    TURSO_AUTH_TOKEN: str | None = None
     CORS_ORIGINS: str = "http://localhost:3000"
 
     @property
