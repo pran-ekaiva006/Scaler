@@ -35,6 +35,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
     <div
       style={{
         height: "100%",
+        minWidth: 250,
         background: "var(--bg-sidebar)",
         display: "flex",
         flexDirection: "column",
