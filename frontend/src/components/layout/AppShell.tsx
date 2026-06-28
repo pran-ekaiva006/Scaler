@@ -169,7 +169,6 @@ export default function AppShell({
                 </Panel>
               </PanelGroup>
             </div>
-            </div>
           </div>
         </div>
       ) : (
