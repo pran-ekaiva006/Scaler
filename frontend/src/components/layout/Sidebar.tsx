@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ChevronRight, Folder } from "lucide-react";
 import CollectionsTree from "./CollectionsTree";
+import HistoryList from "./HistoryList";
 import Modal from "../common/Modal";
 import { createCollection } from "@/lib/api";
 import { useCollectionsStore } from "@/store/collectionsStore";
@@ -82,7 +83,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
         }}
       >
         {activeTab === "collections" && <CollectionsTree />}
-        {activeTab === "history" && <HistoryPlaceholder />}
+        {activeTab === "history" && <HistoryList />}
         {activeTab === "environments" && <EnvironmentsPlaceholder />}
       </div>
 
@@ -135,52 +136,7 @@ export default function Sidebar({ activeTab }: SidebarProps) {
 
 // removed CollectionsPlaceholder
 
-function HistoryPlaceholder() {
-  const items = [
-    { method: "GET", url: "/users", status: 200, time: "342ms" },
-    { method: "POST", url: "/posts", status: 201, time: "523ms" },
-    { method: "GET", url: "/users/999", status: 404, time: "156ms" },
-  ];
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      {items.map((h, i) => (
-        <div
-          key={i}
-          style={{
-            padding: "6px 8px",
-            borderRadius: "var(--radius-sm)",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            fontSize: 12,
-            transition: "background 0.1s",
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.background = "var(--bg-hover)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.background = "transparent")
-          }
-        >
-          <span className={`method-badge method-${h.method}`}>
-            {h.method}
-          </span>
-          <span
-            className="truncate-text"
-            style={{ color: "var(--text-secondary)", flex: 1 }}
-          >
-            {h.url}
-          </span>
-          <span style={{ color: "var(--text-muted)", fontSize: 11 }}>
-            {h.time}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
+// removed HistoryPlaceholder
 
 function EnvironmentsPlaceholder() {
   const items = [
