@@ -9,7 +9,8 @@ import { HistoryEntry } from "@/lib/types";
 import Modal from "../common/Modal";
 
 function timeAgo(dateString: string) {
-  const date = new Date(dateString);
+  const ds = dateString.endsWith("Z") ? dateString : dateString + "Z";
+  const date = new Date(ds);
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 

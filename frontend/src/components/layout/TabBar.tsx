@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTabsStore } from "@/store/tabsStore";
 
 interface Tab {
   id: string;
@@ -26,7 +27,10 @@ export default function TabBar({
   onNewTab,
   onSaveAs,
 }: TabBarProps) {
+  const updateTab = useTabsStore((state) => state.updateTab);
   const [menuOpenId, setMenuOpenId] = React.useState<string | null>(null);
+  const [editingTabId, setEditingTabId] = React.useState<string | null>(null);
+  const [editingName, setEditingName] = React.useState("");
 
   React.useEffect(() => {
     const handleClickOutside = () => setMenuOpenId(null);
@@ -90,9 +94,54 @@ export default function TabBar({
             <span className={`method-badge method-${tab.method}`}>
               {tab.method}
             </span>
-            <span className="truncate-text" style={{ maxWidth: 120 }}>
-              {tab.name}
-            </span>
+            {editingTabId === tab.id ? (
+              <input
+                type="text"
+                value={editingName}
+                autoFocus
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => setEditingName(e.target.value)}
+                onBlur={() => {
+                  if (editingName.trim() && editingName.trim() !== tab.name) {
+                    updateTab(tab.id, { name: editingName.trim() }, true);
+                  }
+                  setEditingTabId(null);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    if (editingName.trim() && editingName.trim() !== tab.name) {
+                      updateTab(tab.id, { name: editingName.trim() }, true);
+                    }
+                    setEditingTabId(null);
+                  } else if (e.key === "Escape") {
+                    setEditingTabId(null);
+                  }
+                }}
+                style={{
+                  background: "var(--bg-input)",
+                  border: "1px solid var(--border-focus)",
+                  color: "white",
+                  outline: "none",
+                  fontSize: 12,
+                  padding: "2px 4px",
+                  borderRadius: "var(--radius-sm)",
+                  width: 120,
+                }}
+              />
+            ) : (
+              <span
+                className="truncate-text"
+                style={{ maxWidth: 120 }}
+                onDoubleClick={(e) => {
+                  e.stopPropagation();
+                  setEditingTabId(tab.id);
+                  setEditingName(tab.name);
+                }}
+                title="Double-click to rename"
+              >
+                {tab.name}
+              </span>
+            )}
             {tab.isDirty && (
               <span
                 style={{
