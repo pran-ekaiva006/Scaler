@@ -130,6 +130,51 @@ async def seed_database():
         ]
         db.add_all(hb_requests)
 
+        # --- Collection 3: ReqRes Demo ---
+        col_rr = Collection(
+            name="ReqRes Demo",
+            description="Sample requests against reqres.in — a hosted REST-API ready to respond to your AJAX requests",
+        )
+        db.add(col_rr)
+        await db.flush()
+
+        rr_requests = [
+            Request(
+                collection_id=col_rr.id,
+                name="List Users (Page 2)", method="GET",
+                url="https://reqres.in/api/users",
+                params=[{"key": "page", "value": "2", "enabled": True}],
+                headers=[], order_index=0,
+            ),
+            Request(
+                collection_id=col_rr.id,
+                name="Single User", method="GET",
+                url="https://reqres.in/api/users/2",
+                params=[], headers=[], order_index=1,
+            ),
+            Request(
+                collection_id=col_rr.id,
+                name="Create User", method="POST",
+                url="https://reqres.in/api/users",
+                params=[],
+                headers=[{"key": "Content-Type", "value": "application/json", "enabled": True}],
+                body_type="raw",
+                body={"raw_content": json.dumps({"name": "morpheus", "job": "leader"}), "raw_content_type": "json"},
+                order_index=2,
+            ),
+            Request(
+                collection_id=col_rr.id,
+                name="Register Successful", method="POST",
+                url="https://reqres.in/api/register",
+                params=[],
+                headers=[{"key": "Content-Type", "value": "application/json", "enabled": True}],
+                body_type="raw",
+                body={"raw_content": json.dumps({"email": "eve.holt@reqres.in", "password": "pistol"}), "raw_content_type": "json"},
+                order_index=3,
+            )
+        ]
+        db.add_all(rr_requests)
+
         # ============================================================
         # ENVIRONMENTS
         # ============================================================
@@ -245,7 +290,7 @@ async def seed_database():
 
         await db.commit()
         print("Database seeded successfully!")
-        print(f"  - {len(jp_requests) + len(hb_requests)} requests across 2 collections")
+        print(f"  - {len(jp_requests) + len(hb_requests) + len(rr_requests)} requests across 3 collections")
         print(f"  - 2 environments ({len(local_vars)} + {len(prod_vars)} variables)")
         print(f"  - {len(history_entries)} history entries")
 
