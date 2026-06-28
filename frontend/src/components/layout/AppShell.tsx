@@ -27,6 +27,29 @@ export default function AppShell({
   children?: React.ReactNode;
 }) {
   const [sidebarTab, setSidebarTab] = useState("collections");
+  const [sidebarWidth, setSidebarWidth] = useState(250);
+
+  const startResizing = React.useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      // IconRail is 48px wide.
+      const newWidth = Math.max(250, Math.min(e.clientX - 48, 800));
+      setSidebarWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  }, []);
   
   const tabs = useTabsStore((state) => state.tabs);
   const activeTabId = useTabsStore((state) => state.activeTabId);
@@ -72,13 +95,14 @@ export default function AppShell({
 
       {/* Sidebar + Main Content or Placeholder Overlay */}
       {["collections", "history", "environments"].includes(sidebarTab) ? (
-        <PanelGroup orientation="horizontal" style={{ flex: 1 }}>
-          {/* Sidebar Panel */}
-          <Panel defaultSize={25} minSize={20} id="sidebar" className="sidebar-panel">
+        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+          {/* Custom Resizable Sidebar */}
+          <div style={{ width: sidebarWidth, flexShrink: 0, height: "100%", overflow: "hidden" }}>
             <Sidebar activeTab={sidebarTab} />
-          </Panel>
+          </div>
 
-          <PanelResizeHandle
+          <div
+            onMouseDown={startResizing}
             style={{
               width: "8px",
               background: "transparent",
@@ -86,22 +110,23 @@ export default function AppShell({
               position: "relative",
               display: "flex",
               justifyContent: "center",
+              zIndex: 10,
             }}
           >
             <div style={{ width: "2px", height: "100%", background: "var(--border-subtle)" }} />
-          </PanelResizeHandle>
+          </div>
 
-          {/* Main Panel */}
-          <Panel id="main">
-            <div
-              style={{
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                background: "var(--bg-panel)",
-                minWidth: 0,
-              }}
-            >
+          {/* Main Area */}
+          <div
+            style={{
+              flex: 1,
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              background: "var(--bg-panel)",
+              minWidth: 0,
+            }}
+          >
             <TopBar />
             <TabBar
               tabs={tabs}
@@ -144,8 +169,9 @@ export default function AppShell({
                 </Panel>
               </PanelGroup>
             </div>
-          </Panel>
-        </PanelGroup>
+            </div>
+          </div>
+        </div>
       ) : (
         <div style={{ flex: 1, background: "var(--bg-panel)", overflow: "hidden" }}>
           {sidebarTab === "settings" ? (
