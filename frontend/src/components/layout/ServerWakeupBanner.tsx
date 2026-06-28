@@ -14,7 +14,7 @@ export default function ServerWakeupBanner() {
       // If still loading after 3 seconds, the Render backend is probably asleep
       timeout = setTimeout(() => {
         setShowBanner(true);
-      }, 3000);
+      }, 1000);
     } else {
       // If it finished loading, instantly hide the banner
       setShowBanner(false);
@@ -28,35 +28,34 @@ export default function ServerWakeupBanner() {
   return (
     <div
       style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "#ff6c37", // Postman orange
-        color: "white",
-        textAlign: "center",
-        padding: "8px",
-        fontSize: "14px",
-        fontWeight: 500,
-        zIndex: 9999, // Ensure it sits above the TopBar
+        position: "fixed",
+        inset: 0,
+        backgroundColor: "#1c1c1c", // Dark background to match app theme
+        color: "#d4d4d4",
+        zIndex: 99999, // Ensure it sits above absolutely everything
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: "8px",
-        boxShadow: "0 2px 10px rgba(0,0,0,0.5)",
+        gap: "16px",
       }}
     >
       <div
         style={{
-          width: "16px",
-          height: "16px",
-          border: "2px solid white",
+          width: "40px",
+          height: "40px",
+          border: "3px solid #ff6c37",
           borderBottomColor: "transparent",
           borderRadius: "50%",
           animation: "spin 1s linear infinite",
         }}
       />
-      Waking up free-tier backend server... (this usually takes 15-50 seconds)
+      <div style={{ fontSize: "16px", fontWeight: 500 }}>
+        Waking up backend server...
+      </div>
+      <div style={{ fontSize: "13px", color: "#888" }}>
+        Render free-tier instances may take up to 50 seconds to spin up.
+      </div>
       <style>
         {`
           @keyframes spin {
