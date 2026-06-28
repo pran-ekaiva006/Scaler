@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.database import init_db
@@ -45,3 +46,9 @@ app.include_router(history.router)
 async def health_check():
     """Simple health check endpoint."""
     return {"status": "ok"}
+
+@app.get("/")
+async def root_redirect():
+    """Redirect anyone visiting the raw backend URL directly to the frontend app."""
+    return RedirectResponse(url="https://scaler-postman.vercel.app/")
+
