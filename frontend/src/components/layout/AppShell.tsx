@@ -74,7 +74,7 @@ export default function AppShell({
       {["collections", "history", "environments"].includes(sidebarTab) ? (
         <PanelGroup orientation="horizontal" style={{ flex: 1 }}>
           {/* Sidebar Panel */}
-          <Panel defaultSize={25} minSize={20} id="sidebar">
+          <Panel defaultSize={25} minSize={20} id="sidebar" style={{ minWidth: 250 }}>
             <Sidebar activeTab={sidebarTab} />
           </Panel>
 
